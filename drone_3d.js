@@ -4,7 +4,7 @@
   const container = document.getElementById('canvas-container');
   if (!container) return;
 
-  let isMobile = window.innerWidth < 768;
+  let isMobile = false; // Always run 3D WebGL on all screen sizes
   const staticDrone = document.getElementById('hero-drone');
 
   // --- Three.js Setup ---
@@ -342,40 +342,89 @@
   // --- GSAP ScrollTrigger Configurations ---
   gsap.registerPlugin(ScrollTrigger);
 
-  // Single timeline linked to the scroll progress of the entire body
-  const droneTl = gsap.timeline({
-    scrollTrigger: {
-      trigger: "body",
-      start: "top top",
-      end: "bottom bottom",
-      scrub: 1.5
+  ScrollTrigger.matchMedia({
+    // Desktop layout (min-width: 768px)
+    "(min-width: 768px)": function() {
+      // Set initial desktop position
+      droneContainer.position.set(2.8, 0.1, 1.5);
+      droneContainer.rotation.set(0.1, -Math.PI / 6, -0.05);
+
+      const desktopTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.5
+        }
+      });
+
+      desktopTl
+        // 1. Move towards left side (Services Section)
+        .to(droneContainer.position, { x: -2.8, y: -0.2, z: 1.2, ease: "power1.inOut" }, "services")
+        .to(droneContainer.rotation, { x: 0.15, y: Math.PI / 5, z: 0.15, ease: "power1.inOut" }, "services")
+        
+        // 2. Glide back to the right side (Projects Section)
+        .to(droneContainer.position, { x: 2.8, y: -0.3, z: 1.5, ease: "power1.inOut" }, "projects")
+        .to(droneContainer.rotation, { x: -0.1, y: -Math.PI / 5, z: -0.1, ease: "power1.inOut" }, "projects")
+        
+        // 3. Float to the center background (How It Works Section)
+        .to(droneContainer.position, { x: 0, y: 0.6, z: -1.0, ease: "power1.inOut" }, "how")
+        .to(droneContainer.rotation, { x: -0.2, y: 0, z: 0.05, ease: "power1.inOut" }, "how")
+        
+        // 4. Glide to the right side (Estimate Form Section)
+        .to(droneContainer.position, { x: 2.5, y: -0.4, z: 1.5, ease: "power1.inOut" }, "estimate")
+        .to(droneContainer.rotation, { x: 0.15, y: -Math.PI / 4, z: 0.1, ease: "power1.inOut" }, "estimate")
+        
+        // 5. Drift to the left side (Testimonials Section)
+        .to(droneContainer.position, { x: -2.5, y: -0.2, z: 1.2, ease: "power1.inOut" }, "testimonials")
+        .to(droneContainer.rotation, { x: 0.2, y: Math.PI / 6, z: -0.1, ease: "power1.inOut" }, "testimonials")
+        
+        // 6. Descend, perform a freestyle flip, and disappear into distance (Footer / Contact Section)
+        .to(droneContainer.position, { x: 0, y: -2.5, z: -3.0, ease: "power1.inOut" }, "contact")
+        .to(droneContainer.rotation, { x: Math.PI * 2 + Math.PI / 2.2, y: 0, z: 0, ease: "power1.inOut" }, "contact");
+    },
+
+    // Mobile layout (max-width: 767px)
+    "(max-width: 767px)": function() {
+      // Set initial mobile position (centered in the hero wrap area)
+      droneContainer.position.set(0, -1.0, 1.2);
+      droneContainer.rotation.set(0.1, -Math.PI / 6, -0.05);
+
+      const mobileTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1.5
+        }
+      });
+
+      mobileTl
+        // 1. Center slightly lower for Services Section
+        .to(droneContainer.position, { x: 0, y: -1.2, z: 0.8, ease: "power1.inOut" }, "services")
+        .to(droneContainer.rotation, { x: 0.1, y: Math.PI / 8, z: 0.05, ease: "power1.inOut" }, "services")
+        
+        // 2. Center for Projects Section
+        .to(droneContainer.position, { x: 0, y: -1.1, z: 0.8, ease: "power1.inOut" }, "projects")
+        .to(droneContainer.rotation, { x: -0.05, y: -Math.PI / 8, z: -0.05, ease: "power1.inOut" }, "projects")
+        
+        // 3. Move deep into background for How It Works Section
+        .to(droneContainer.position, { x: 0, y: 0.0, z: 0.2, ease: "power1.inOut" }, "how")
+        .to(droneContainer.rotation, { x: -0.1, y: 0, z: 0.02, ease: "power1.inOut" }, "how")
+        
+        // 4. Center for Estimate Section
+        .to(droneContainer.position, { x: 0, y: -1.2, z: 0.8, ease: "power1.inOut" }, "estimate")
+        .to(droneContainer.rotation, { x: 0.1, y: -Math.PI / 6, z: 0.05, ease: "power1.inOut" }, "estimate")
+        
+        // 5. Center for Testimonials Section
+        .to(droneContainer.position, { x: 0, y: -1.1, z: 0.8, ease: "power1.inOut" }, "testimonials")
+        .to(droneContainer.rotation, { x: 0.1, y: Math.PI / 8, z: -0.05, ease: "power1.inOut" }, "testimonials")
+        
+        // 6. Descend, flip and fade into distance
+        .to(droneContainer.position, { x: 0, y: -2.5, z: -3.0, ease: "power1.inOut" }, "contact")
+        .to(droneContainer.rotation, { x: Math.PI * 2 + Math.PI / 2.2, y: 0, z: 0, ease: "power1.inOut" }, "contact");
     }
   });
-
-  droneTl
-    // 1. Move towards left side (Services Section)
-    .to(droneContainer.position, { x: -2.8, y: -0.2, z: 1.2, ease: "power1.inOut" }, "services")
-    .to(droneContainer.rotation, { x: 0.15, y: Math.PI / 5, z: 0.15, ease: "power1.inOut" }, "services")
-    
-    // 2. Glide back to the right side (Projects Section)
-    .to(droneContainer.position, { x: 2.8, y: -0.3, z: 1.5, ease: "power1.inOut" }, "projects")
-    .to(droneContainer.rotation, { x: -0.1, y: -Math.PI / 5, z: -0.1, ease: "power1.inOut" }, "projects")
-    
-    // 3. Float to the center background (How It Works Section)
-    .to(droneContainer.position, { x: 0, y: 0.6, z: -1.0, ease: "power1.inOut" }, "how")
-    .to(droneContainer.rotation, { x: -0.2, y: 0, z: 0.05, ease: "power1.inOut" }, "how")
-    
-    // 4. Glide to the right side (Estimate Form Section)
-    .to(droneContainer.position, { x: 2.5, y: -0.4, z: 1.5, ease: "power1.inOut" }, "estimate")
-    .to(droneContainer.rotation, { x: 0.15, y: -Math.PI / 4, z: 0.1, ease: "power1.inOut" }, "estimate")
-    
-    // 5. Drift to the left side (Testimonials Section)
-    .to(droneContainer.position, { x: -2.5, y: -0.2, z: 1.2, ease: "power1.inOut" }, "testimonials")
-    .to(droneContainer.rotation, { x: 0.2, y: Math.PI / 6, z: -0.1, ease: "power1.inOut" }, "testimonials")
-    
-    // 6. Descend, perform a freestyle flip, and disappear into distance (Footer / Contact Section)
-    .to(droneContainer.position, { x: 0, y: -2.5, z: -3.0, ease: "power1.inOut" }, "contact")
-    .to(droneContainer.rotation, { x: Math.PI * 2 + Math.PI / 2.2, y: 0, z: 0, ease: "power1.inOut" }, "contact");
 
   // --- Mouse Parallax tilt effect ---
   let mouseX = 0;
@@ -388,27 +437,20 @@
 
   // --- Mobile Fallback Check ---
   function checkMobile() {
-    isMobile = window.innerWidth < 768;
-    
-    if (isMobile) {
-      container.style.display = 'none';
-      if (staticDrone) {
-        staticDrone.style.opacity = '1';
-        staticDrone.style.pointerEvents = 'auto';
-        staticDrone.style.width = '';
-        staticDrone.style.height = '';
-        staticDrone.style.display = 'block';
-      }
-    } else {
-      container.style.display = 'block';
-      if (staticDrone) {
-        staticDrone.style.opacity = '0';
-        staticDrone.style.pointerEvents = 'none';
-        staticDrone.style.width = '0';
-        staticDrone.style.height = '0';
-        staticDrone.style.display = 'none';
-      }
+    // 3D WebGL drone is always active now on mobile and desktop
+    isMobile = false; 
+    container.style.display = 'block';
+    if (staticDrone) {
+      staticDrone.style.opacity = '0';
+      staticDrone.style.pointerEvents = 'none';
+      staticDrone.style.width = '0';
+      staticDrone.style.height = '0';
+      staticDrone.style.display = 'none';
     }
+    const fallbackGlow = document.querySelector('.drone-glow-ring');
+    if (fallbackGlow) fallbackGlow.style.display = 'none';
+    const fallbackShadow = document.querySelector('.drone-shadow');
+    if (fallbackShadow) fallbackShadow.style.display = 'none';
   }
 
   // Run immediately on load
@@ -417,11 +459,9 @@
   // Resize handler
   window.addEventListener('resize', () => {
     checkMobile();
-    if (!isMobile) {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
   // --- Animation loop ---
@@ -432,7 +472,7 @@
   function animate() {
     requestAnimationFrame(animate);
     
-    if (isMobile) return; // suspend WebGL render loops on mobile viewports
+    // Always run WebGL render loop for interactive 3D drone
 
     const dt = clock.getDelta();
     const time = clock.getElapsedTime();

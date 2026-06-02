@@ -19,6 +19,14 @@
   <!-- 3D Canvas Container -->
   <div id="canvas-container"></div>
 
+  <!-- ========== DEVELOPMENT BANNER ========== -->
+  <div class="dev-banner">
+    <div class="dev-banner-track">
+      <div class="dev-banner-text">⚠️ Website under development — New features coming soon! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚠️ Website under development — New features coming soon! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <div class="dev-banner-text" aria-hidden="true">⚠️ Website under development — New features coming soon! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ⚠️ Website under development — New features coming soon! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    </div>
+  </div>
+
   <!-- ========== TOP INFO BAR ========== -->
   <div class="top-info-bar" id="top-info-bar">
     <div class="container top-info-inner">
@@ -56,10 +64,10 @@
         <li><a href="#academy">Academy</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#estimate">Get Estimate</a></li>
+        <li><a href="#estimate">Get Estimate (₹199)</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
-      <a href="#estimate" class="btn-nav">Get a Quote</a>
+      <a href="#estimate" class="btn-nav">Get Estimate (₹199)</a>
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </button>
@@ -79,15 +87,15 @@
       <p class="hero-sub" id="h-sub">Custom FPV Drones. Cinematic Shoots. Race Machines.<br />Built for those who refuse
         to be grounded.</p>
       <div class="hero-cta">
-        <a href="#estimate" class="btn-primary" id="hero-cta-quote">Get Free Estimate</a>
+        <a href="#estimate" class="btn-primary" id="hero-cta-quote">Get Estimate (₹199)</a>
         <a href="#projects" class="btn-ghost" id="hero-cta-projects">View Projects</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><span class="stat-num">120+</span><span class="stat-label">Drones Built</span></div>
+        <div class="stat"><span class="stat-num">30+</span><span class="stat-label">Drones Built</span></div>
         <div class="stat-div"></div>
         <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Events Covered</span></div>
         <div class="stat-div"></div>
-        <div class="stat"><span class="stat-num">5★</span><span class="stat-label">Client Rating</span></div>
+        <div class="stat"><span class="stat-num">4.7★</span><span class="stat-label">Client Rating</span></div>
       </div>
     </div>
     <div class="hero-drone-wrap">
@@ -105,7 +113,7 @@
   <section class="academy" id="academy">
     <div class="container">
       <div class="section-tag">Academy</div>
-      <h2 class="section-title">Sky High <span class="accent">Academy</span></h2>
+      <h2 class="section-title">Sky High FPV <span class="accent">Academy</span></h2>
       <p class="section-sub">Master the art of FPV. From simulator practice to building and piloting real high-performance quads.</p>
 
       <div class="academy-grid">
@@ -587,9 +595,9 @@
   <!-- ========== ESTIMATE FORM ========== -->
   <section class="estimate" id="estimate">
     <div class="container">
-      <div class="section-tag">Free Estimate</div>
-      <h2 class="section-title">Tell Us What <span class="accent">You Need</span></h2>
-      <p class="section-sub">Fill in the details below and we'll send you a custom quote within 24 hours.</p>
+      <div class="section-tag">Detailed Estimate (₹199)</div>
+      <h2 class="section-title">Get Your Custom <span class="accent">Engineering Sheet</span></h2>
+      <p class="section-sub">Submit your specs for a comprehensive parts selection, build outline, and quote. A nominal fee of <strong>₹199</strong> applies (100% credited back to your final order invoice).</p>
 
       <div class="estimate-wrap">
         <form class="estimate-form" id="estimate-form" novalidate>
@@ -705,8 +713,7 @@
           </div>
 
           <button type="submit" class="btn-submit" id="btn-submit">
-            <span class="btn-text">🚁 Send My Request</span>
-            <span class="btn-loader" style="display:none;">Sending...</span>
+            <span class="btn-text">🚁 Submit & Pay ₹199</span>
           </button>
         </form>
 
@@ -737,14 +744,34 @@
         </div>
       </div>
 
-      <!-- Success Message -->
+      <!-- Success / Payment Simulation Modal -->
       <div class="success-msg" id="success-msg" style="display:none;">
-        <div class="success-inner">
+        <div class="success-inner" id="payment-step-1">
+          <div class="success-icon">💳</div>
+          <h3>Specifications Saved!</h3>
+          <p class="payment-desc" style="font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6;">To generate your customized engineering sheet, parts list, and build quote, please complete the consultation fee of <strong>₹199</strong> (100% credited back to your final order invoice).</p>
+          
+          <div class="payment-method-box" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; text-align: left;">
+            <p style="font-size: 0.85rem; color: white; margin-bottom: 12px; font-weight: 600; font-family: var(--font-head); letter-spacing: 0.5px;">SELECT PAYMENT METHOD:</p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; color: var(--text-dim); margin-bottom: 0;">
+                <input type="radio" name="pay-method" value="upi" checked style="accent-color: var(--cyan);" /> 📱 UPI / GPay / PhonePe
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; color: var(--text-dim); margin-bottom: 0;">
+                <input type="radio" name="pay-method" value="card" style="accent-color: var(--cyan);" /> 💳 Credit / Debit Card
+              </label>
+            </div>
+          </div>
+          
+          <button class="btn-primary" id="btn-pay-now" style="width: 100%; justify-content: center;">Proceed to Pay ₹199</button>
+        </div>
+
+        <div class="success-inner" id="payment-step-2" style="display: none;">
           <div class="success-icon">🎉</div>
-          <h3>Request Received!</h3>
-          <p>Thanks! We'll review your project and get back to you within <strong>24 hours</strong> with a detailed
-            estimate.</p>
-          <a href="#home" class="btn-primary">Back to Home</a>
+          <h3>Payment Successful!</h3>
+          <p style="font-size: 0.95rem; margin-bottom: 16px; line-height: 1.6;">Thank you! We have received your ₹199 payment. Our FPV engineers are already compiling your custom parts selection, flight controller configuration, and assembly schedule.</p>
+          <p style="color: var(--cyan); font-weight: bold; font-size: 0.95rem; margin-bottom: 24px;">Your Engineering Sheet will be sent within 24 Hours!</p>
+          <button class="btn-primary" id="btn-payment-done" style="width: 100%; justify-content: center;">Back to Home</button>
         </div>
       </div>
     </div>

@@ -50,11 +50,48 @@ body {
 ::selection { background: rgba(0,212,255,0.3); color: white; }
 
 /* ============================================
+   DEVELOPMENT TICKER BANNER
+   ============================================ */
+.dev-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 30px;
+  background: linear-gradient(90deg, #d97706, #b45309);
+  color: white;
+  z-index: 1002;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+}
+
+.dev-banner-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 22s linear infinite;
+}
+
+.dev-banner-text {
+  padding-right: 60px;
+  white-space: nowrap;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+/* ============================================
    TOP INFO BAR
    ============================================ */
 .top-info-bar {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 30px; left: 0; right: 0;
   height: 40px;
   background: #030810;
   border-bottom: 1px solid rgba(0, 212, 255, 0.1);
@@ -148,7 +185,7 @@ body {
    ============================================ */
 .navbar {
   position: fixed;
-  top: 40px; left: 0; right: 0;
+  top: 70px; left: 0; right: 0;
   height: var(--nav-h);
   z-index: 1000;
   background: rgba(5,12,26,0.6);
@@ -231,7 +268,7 @@ body {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding-top: calc(var(--nav-h) + 40px);
+  padding-top: calc(var(--nav-h) + 70px);
   overflow: hidden;
   background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(0,150,255,0.08) 0%, transparent 70%),
               radial-gradient(ellipse 60% 80% at 20% 80%, rgba(124,58,237,0.07) 0%, transparent 60%),
@@ -1018,7 +1055,7 @@ section { padding: 100px 0; }
 }
 
 @media (max-width: 768px) {
-  .hero { flex-direction: column; text-align: center; padding: 120px 20px 60px; min-height: auto; }
+  .hero { flex-direction: column; text-align: center; padding: 165px 20px 60px; min-height: auto; }
   .hero-content { padding: 0; max-width: 100%; }
   .hero-cta { justify-content: center; }
   .hero-stats { justify-content: center; }

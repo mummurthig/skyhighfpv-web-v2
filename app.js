@@ -146,12 +146,19 @@ if (estimateForm) {
 
     // Simulate sending
     btnSubmit.disabled = true;
-    btnSubmit.querySelector('.btn-text').textContent = '⏳ Sending...';
+    btnSubmit.querySelector('.btn-text').textContent = '⏳ Processing Request...';
     setTimeout(() => {
       btnSubmit.disabled = false;
-      btnSubmit.querySelector('.btn-text').textContent = '🚁 Send My Request';
+      btnSubmit.querySelector('.btn-text').textContent = '🚁 Submit & Pay ₹199';
       estimateForm.reset();
       updateSummary();
+      
+      // Setup simulated payment step views
+      const step1 = document.getElementById('payment-step-1');
+      const step2 = document.getElementById('payment-step-2');
+      if (step1) step1.style.display = 'block';
+      if (step2) step2.style.display = 'none';
+      
       successMsg.style.display = 'flex';
     }, 1800);
   });
@@ -160,7 +167,37 @@ if (estimateForm) {
 /* ---- Close success message ---- */
 if (successMsg) {
   successMsg.addEventListener('click', (e) => {
-    if (e.target === successMsg) successMsg.style.display = 'none';
+    // Only close if clicking outside or if payment completed
+    const step2Visible = document.getElementById('payment-step-2')?.style.display === 'block';
+    if (e.target === successMsg && step2Visible) {
+      successMsg.style.display = 'none';
+    }
+  });
+}
+
+/* ---- Simulated Payment Processing Handlers ---- */
+const btnPayNow = document.getElementById('btn-pay-now');
+const btnPaymentDone = document.getElementById('btn-payment-done');
+
+if (btnPayNow) {
+  btnPayNow.addEventListener('click', () => {
+    btnPayNow.disabled = true;
+    btnPayNow.textContent = '⏳ Authorizing Payment...';
+    
+    setTimeout(() => {
+      btnPayNow.disabled = false;
+      btnPayNow.textContent = 'Proceed to Pay ₹199';
+      const step1 = document.getElementById('payment-step-1');
+      const step2 = document.getElementById('payment-step-2');
+      if (step1) step1.style.display = 'none';
+      if (step2) step2.style.display = 'block';
+    }, 1500);
+  });
+}
+
+if (btnPaymentDone) {
+  btnPaymentDone.addEventListener('click', () => {
+    successMsg.style.display = 'none';
   });
 }
 
