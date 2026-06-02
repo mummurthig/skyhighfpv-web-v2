@@ -373,9 +373,9 @@
     .to(droneContainer.position, { x: -2.5, y: -0.2, z: 1.2, ease: "power1.inOut" }, "testimonials")
     .to(droneContainer.rotation, { x: 0.2, y: Math.PI / 6, z: -0.1, ease: "power1.inOut" }, "testimonials")
     
-    // 6. Descend and disappear into distance (Footer / Contact Section)
+    // 6. Descend, perform a freestyle flip, and disappear into distance (Footer / Contact Section)
     .to(droneContainer.position, { x: 0, y: -2.5, z: -3.0, ease: "power1.inOut" }, "contact")
-    .to(droneContainer.rotation, { x: Math.PI / 2.2, y: 0, z: 0, ease: "power1.inOut" }, "contact");
+    .to(droneContainer.rotation, { x: Math.PI * 2 + Math.PI / 2.2, y: 0, z: 0, ease: "power1.inOut" }, "contact");
 
   // --- Mouse Parallax tilt effect ---
   let mouseX = 0;

@@ -65,7 +65,6 @@ if (heroDroneWrap && heroDrone) {
 
 /* ---- Project Filter ---- */
 const filterBtns = document.querySelectorAll('.filter-btn');
-const projectCards = document.querySelectorAll('.project-card');
 
 filterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -73,6 +72,9 @@ filterBtns.forEach(btn => {
     btn.classList.add('active');
 
     const filter = btn.dataset.filter;
+    // Query project cards dynamically so it finds new cards injected by CMS content
+    const projectCards = document.querySelectorAll('.project-card');
+    
     projectCards.forEach(card => {
       const tag = card.dataset.tag;
       if (filter === 'all' || tag === filter) {
@@ -164,7 +166,7 @@ if (successMsg) {
 
 /* ---- Scroll Reveal Animation ---- */
 const revealEls = document.querySelectorAll(
-  '.service-card, .project-card, .step, .testi-card, .sidebar-card'
+  '.service-card, .project-card, .course-card, .step, .testi-card, .sidebar-card'
 );
 revealEls.forEach(el => el.classList.add('reveal'));
 
@@ -262,6 +264,12 @@ fetch('/api/content')
         const footerPhone = document.getElementById('footer-phone');
         if (footerPhone) footerPhone.textContent = '📱 ' + phone;
         
+        const topPhone = document.getElementById('top-phone');
+        if (topPhone) {
+          topPhone.textContent = phone;
+          topPhone.href = 'tel:' + phone.replace(/\s+/g, '');
+        }
+        
         const waLink = document.getElementById('wa-link');
         if (waLink) waLink.href = 'https://wa.me/' + phone.replace(/\D/g, '');
       }
@@ -285,53 +293,122 @@ fetch('/api/content')
         document.getElementById('hero-drone').src = data.hero.image;
       }
     }
-    if (data.services) {
-      const sGrid = document.getElementById('dynamic-services-grid');
-      let html = '';
-      data.services.forEach(s => {
-        const badgeHtml = s.badge ? `<div class="service-badge">${s.badge}</div>` : '';
-        const featHtml = s.features.map(f => `<li>${f}</li>`).join('');
-        html += `
-          <div class="service-card" data-category="${s.id}" id="service-${s.id}">
-            <div class="service-icon">${s.icon}</div>
-            ${badgeHtml}
-            <h3>${s.title}</h3>
-            <p>${s.description}</p>
-            <ul class="service-list">${featHtml}</ul>
-            <a href="#estimate" class="service-cta">Order Now →</a>
-          </div>
-        `;
-      });
-      sGrid.innerHTML = html;
-      
-      // Re-bind service card click events
-      document.querySelectorAll('.service-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (e.target.tagName === 'A') return;
-          const cat = card.dataset.category;
-          if (cat && catEl) {
-            catEl.value = cat;
-            updateSummary();
-            document.getElementById('estimate').scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-        card.style.cursor = 'pointer';
-        revealObserver.observe(card);
-      });
-    }
+    // Observe services static cards for reveal animation
+    document.querySelectorAll('#dynamic-services-grid .project-card').forEach(card => {
+      revealObserver.observe(card);
+    });
     
     if (data.projects) {
       const pGrid = document.getElementById('dynamic-projects-grid');
       let html = '';
+      
+      const optionsConfig = {
+        "proj-1": {
+          options: [
+            {
+              label: "Select VTX (Video)",
+              choices: ["DJI O3 HD", "Walksnail Avatar HD", "Analog VTX"]
+            },
+            {
+              label: "Power System",
+              choices: ["6S (Xing2 2207 1850KV)", "4S (Xing2 2207 2750KV)"]
+            },
+            {
+              label: "Receiver",
+              choices: ["ExpressLRS 2.4GHz", "TBS Crossfire Nano"]
+            }
+          ]
+        },
+        "proj-2": {
+          options: [
+            {
+              label: "Select Coverage",
+              choices: ["Half Day (4 hours)", "Full Day (8 hours)"]
+            },
+            {
+              label: "Select Deliverable",
+              choices: ["Raw Footage", "Edited Cinematic Reel"]
+            }
+          ]
+        },
+        "proj-3": {
+          options: [
+            {
+              label: "Select VTX",
+              choices: ["Analog Race VTX", "HDZero Race V2"]
+            },
+            {
+              label: "Receiver",
+              choices: ["ExpressLRS 2.4GHz"]
+            }
+          ]
+        },
+        "proj-4": {
+          options: [
+            {
+              label: "Select Receiver",
+              choices: ["ExpressLRS 2.4GHz", "TBS Crossfire Nano", "No RX (PNP Mode)"]
+            }
+          ]
+        },
+        "proj-5": {
+          options: [
+            {
+              label: "Drone Class",
+              choices: ["Light CineWhoop", "Heavy Lifter (GoPro/RED)"]
+            },
+            {
+              label: "Resolution",
+              choices: ["4K 60fps ProRes", "6K RAW Film"]
+            }
+          ]
+        },
+        "proj-6": {
+          options: [
+            {
+              label: "Select Battery Link",
+              choices: ["Single LiPo setup", "Dual Battery Mount"]
+            },
+            {
+              label: "Receiver",
+              choices: ["ExpressLRS 915MHz", "TBS Crossfire Diversity"]
+            }
+          ]
+        }
+      };
+
       data.projects.forEach(p => {
         const imgStyle = p.image ? `background: url('${p.image}') center/cover;` : `background: ${p.gradient};`;
-        const specsHtml = p.specs.map(sp => `<span>${sp}</span>`).join('');
         
         let overlayText = "";
         if (p.tag === "custom") overlayText = "Custom Build";
         if (p.tag === "event") overlayText = "Event Shoot";
         if (p.tag === "race") overlayText = "Race Build";
         if (p.tag === "pnp") overlayText = "PNP Build";
+
+        const config = optionsConfig[p.id];
+        let optionsHtml = '';
+        if (config) {
+          optionsHtml = `<div class="card-options-wrapper">`;
+          config.options.forEach(opt => {
+            optionsHtml += `
+              <div class="card-option-group">
+                <label>${opt.label}</label>
+                <select class="card-select-opt" data-proj-id="${p.id}">
+            `;
+            opt.choices.forEach((choice, cIdx) => {
+              const selected = (cIdx === 0) ? 'selected' : '';
+              optionsHtml += `
+                <option value="${choice}" ${selected}>${choice}</option>
+              `;
+            });
+            optionsHtml += `
+                </select>
+              </div>
+            `;
+          });
+          optionsHtml += `</div>`;
+        }
 
         html += `
           <div class="project-card" data-tag="${p.tag}" id="${p.id}">
@@ -344,14 +421,16 @@ fetch('/api/content')
             <div class="project-info">
               <h4>${p.title}</h4>
               <p>${p.description}</p>
-              <div class="proj-specs">${specsHtml}</div>
+              ${optionsHtml}
+              <div class="card-footer-price">
+                <button class="btn-select-build" data-proj-id="${p.id}" data-tag="${p.tag}" data-title="${p.title}">Book Build</button>
+              </div>
             </div>
           </div>
         `;
       });
       pGrid.innerHTML = html;
       
-      // Re-bind filter Logic?
       // Re-observe for reveal
       document.querySelectorAll('.project-card').forEach(c => revealObserver.observe(c));
     }
@@ -395,5 +474,46 @@ if (termsModal) {
     if (e.target === termsModal) {
       closeTermsModal();
     }
-  });
 }
+
+/* ---- Project Options & Booking Controls ---- */
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('btn-select-build')) {
+    const btn = e.target;
+    const projId = btn.dataset.projId;
+    const tag = btn.dataset.tag;
+    const title = btn.dataset.title;
+    
+    let detailsText = `I would like to order: ${title}\n\n`;
+    
+    const card = btn.closest('.project-card');
+    if (card) {
+      const selects = card.querySelectorAll('.card-select-opt');
+      selects.forEach(sel => {
+        const opt = sel.options[sel.selectedIndex];
+        const label = sel.previousElementSibling.textContent;
+        detailsText += `* ${label}: ${opt.value}\n`;
+      });
+    }
+
+    // Pre-populate estimate form
+    const categorySelect = document.getElementById('category');
+    if (categorySelect) {
+      categorySelect.value = tag;
+      categorySelect.dispatchEvent(new Event('change'));
+    }
+    
+    const detailsArea = document.getElementById('details');
+    if (detailsArea) {
+      detailsArea.value = detailsText;
+      detailsArea.focus();
+    }
+
+    // Scroll to estimate form section smoothly
+    const estimateSection = document.getElementById('estimate');
+    if (estimateSection) {
+      estimateSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+});
+
