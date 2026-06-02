@@ -213,7 +213,7 @@ const statsObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const statNums = document.querySelectorAll('.stat-num');
-      animateCount(statNums[0], 120, '', '+');
+      animateCount(statNums[0], 30, '', '+');
       animateCount(statNums[1], 50, '', '+');
       statsObserver.disconnect();
     }
