@@ -54,29 +54,82 @@
   const mLEDG     = new THREE.MeshStandardMaterial({ color: 0x00d4ff, emissive: 0x00d4ff, emissiveIntensity: 3 });
   const mCamHouse = new THREE.MeshStandardMaterial({ color: 0x1a1c20, roughness: 0.28, metalness: 0.50 });
 
+  // Duct guards foam & strap materials
+  const mDuctFoamRed   = new THREE.MeshStandardMaterial({ color: 0xe24738, roughness: 0.85, metalness: 0.10 });
+  const mDuctFoamWhite = new THREE.MeshStandardMaterial({ color: 0xececec, roughness: 0.80, metalness: 0.10 });
+  const mStrap         = new THREE.MeshStandardMaterial({ color: 0x1a1c20, roughness: 0.70, metalness: 0.05 });
+
   const propGroups = [];
   const ductMeshes = [];
 
-  // 1. CENTRAL BODY
-  const coreBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.25, 0.9), mDarkGray);
-  coreBody.position.y = 0.15;
-  coreBody.rotation.x = 0.05; 
-  droneGroup.add(coreBody);
+  // 1. CENTRAL BODY (CARBON PLATES & STANDOFFS)
+  const bodyGroup = new THREE.Group();
+  droneGroup.add(bodyGroup);
 
-  const nose = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.45, 16), mDarkGray);
-  nose.rotation.z = Math.PI / 2;
-  nose.position.set(0, 0.15, 0.45);
-  droneGroup.add(nose);
+  // Bottom plate (Main Frame Carbon Plate)
+  const botPlate = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.02, 0.95), mCF);
+  botPlate.position.set(0, 0.05, 0.05);
+  bodyGroup.add(botPlate);
 
+  // Top plate (Elevated Carbon Plate)
+  const topPlate = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.02, 0.85), mCF);
+  topPlate.position.set(0, 0.26, 0.0);
+  bodyGroup.add(topPlate);
+
+  // Aluminum standoffs (connecting top and bottom plates)
+  const standoffPositions = [
+    { x: 0.13, z: 0.35 },
+    { x: -0.13, z: 0.35 },
+    { x: 0.13, z: 0.0 },
+    { x: -0.13, z: 0.0 },
+    { x: 0.13, z: -0.35 },
+    { x: -0.13, z: -0.35 }
+  ];
+  standoffPositions.forEach(pos => {
+    const standoff = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.20, 8), mSilver);
+    standoff.position.set(pos.x, 0.15, pos.z);
+    bodyGroup.add(standoff);
+  });
+
+  // Front camera side brackets (aluminum/carbon plates holding camera)
+  const camBracketL = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.16, 0.16), mCF);
+  camBracketL.position.set(0.12, 0.14, 0.46);
+  bodyGroup.add(camBracketL);
+
+  const camBracketR = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.16, 0.16), mCF);
+  camBracketR.position.set(-0.12, 0.14, 0.46);
+  bodyGroup.add(camBracketR);
+
+  // 3D Printed TPU Camera mount on top of top plate front
+  const goproMount = new THREE.Group();
+  goproMount.position.set(0, 0.29, 0.30);
+  bodyGroup.add(goproMount);
+  
+  const goproMountBase = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.04, 0.12), mCF);
+  goproMount.add(goproMountBase);
+  
+  const prongL = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.08, 0.06), mCF);
+  prongL.position.set(0.03, 0.05, 0);
+  goproMount.add(prongL);
+  
+  const prongR = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.08, 0.06), mCF);
+  prongR.position.set(-0.03, 0.05, 0);
+  goproMount.add(prongR);
+
+  const prongBolt = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.12, 8), mSilver);
+  prongBolt.rotation.z = Math.PI / 2;
+  prongBolt.position.set(0, 0.05, 0);
+  goproMount.add(prongBolt);
+
+  // Battery Group
   const batt = new THREE.Group();
-  batt.position.set(0, 0.38, -0.15);
-  batt.rotation.x = -0.05;
-  droneGroup.add(batt);
+  batt.position.set(0, 0.38, -0.08);
+  bodyGroup.add(batt);
 
-  const battBody = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.22, 0.6), new THREE.MeshStandardMaterial({ color: 0x1e2025 }));
+  const battBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.20, 0.52), new THREE.MeshStandardMaterial({ color: 0x1c1e22, roughness: 0.4, metalness: 0.1 }));
   batt.add(battBody);
 
-  // Custom text texture dynamically drawn via 2D Canvas
+  // Custom text texture dynamically drawn via 2D Canvas for branding
   const textCanvas = document.createElement('canvas');
   textCanvas.width = 256;
   textCanvas.height = 128;
@@ -93,60 +146,72 @@
 
   const textTex = new THREE.CanvasTexture(textCanvas);
   const textMat = new THREE.MeshStandardMaterial({ map: textTex, roughness: 0.25, metalness: 0.1 });
+
+  // Custom battery strap white text logo
+  const strapCanvas = document.createElement('canvas');
+  strapCanvas.width = 256;
+  strapCanvas.height = 64;
+  const sCtx = strapCanvas.getContext('2d');
+  sCtx.fillStyle = '#1a1c20'; // strap background
+  sCtx.fillRect(0, 0, 256, 64);
+  sCtx.fillStyle = '#ffffff'; // white text
+  sCtx.font = 'bold 28px "Orbitron", sans-serif';
+  sCtx.textAlign = 'center';
+  sCtx.textBaseline = 'middle';
+  sCtx.fillText('GEPRC', 128, 32);
+
+  const strapTex = new THREE.CanvasTexture(strapCanvas);
+  const strapMat = new THREE.MeshStandardMaterial({ map: strapTex, roughness: 0.5, metalness: 0.1 });
   
-  // Decal / label mesh on the top face of the battery housing
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.18), textMat);
-  label.position.set(0, 0.111, 0); // slightly above top face
+  // Decal / label mesh on the top face of the battery housing (behind strap)
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.12), textMat);
+  label.position.set(0, 0.101, 0.16); // slightly above top face
   label.rotation.x = -Math.PI / 2; // flat facing up
   batt.add(label);
 
   // Decal / label mesh on the front face of the battery housing (visible from front)
-  const frontLabel = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.18), textMat);
-  frontLabel.position.set(0, 0, 0.301); // slightly in front of front face
+  const frontLabel = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.12), textMat);
+  frontLabel.position.set(0, 0, 0.261); // slightly in front of front face
   frontLabel.rotation.y = 0; // facing forward
   batt.add(frontLabel);
 
+  // Battery Strap wrapping around battery center
+  const strapTop = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.015, 0.12), strapMat);
+  strapTop.position.set(0, 0.108, 0);
+  batt.add(strapTop);
+
+  const strapLeft = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.20, 0.12), mStrap);
+  strapLeft.position.set(0.128, 0, 0);
+  batt.add(strapLeft);
+
+  const strapRight = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.20, 0.12), mStrap);
+  strapRight.position.set(-0.128, 0, 0);
+  batt.add(strapRight);
+
   for (let c = 0; c < 4; c++) {
-    const cell = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.015, 0.015), mLEDG);
-    cell.position.set(-0.09 + c * 0.06, 0.49, -0.44);
-    cell.rotation.x = -0.05;
+    const cell = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.012, 0.012), mLEDG);
+    cell.position.set(-0.06 + c * 0.04, 0.485, -0.22);
     droneGroup.add(cell); 
   }
 
-  const cageL = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.35, 0.25), mCF);
-  cageL.position.set(0.22, 0.15, 0.55);
-  droneGroup.add(cageL);
-
-  const cageR = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.35, 0.25), mCF);
-  cageR.position.set(-0.22, 0.15, 0.55);
-  droneGroup.add(cageR);
-
-  const cageTop = new THREE.Mesh(new THREE.BoxGeometry(0.47, 0.03, 0.25), mCF);
-  cageTop.position.set(0, 0.31, 0.55);
-  droneGroup.add(cageTop);
-
-  const basePlate = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.04, 0.9), mCF);
-  basePlate.position.set(0, -0.01, 0);
-  droneGroup.add(basePlate);
-
   // 2. CAMERA
   const gimbGroup = new THREE.Group();
-  gimbGroup.position.set(0, 0.15, 0.62);
+  gimbGroup.position.set(0, 0.14, 0.46);
   droneGroup.add(gimbGroup);
 
-  const camBody = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.25, 0.25), mCamHouse);
+  const camBody = new THREE.Mesh(new THREE.BoxGeometry(0.20, 0.20, 0.20), mCamHouse);
   gimbGroup.add(camBody);
-  const lensB = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.11, 0.08, 20), mCamHouse);
+  const lensB = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.08, 20), mCamHouse);
   lensB.rotation.x = Math.PI / 2;
-  lensB.position.z = 0.16;
+  lensB.position.z = 0.12;
   gimbGroup.add(lensB);
-  const lensG = new THREE.Mesh(new THREE.CircleGeometry(0.08, 20), mGlass);
-  lensG.position.z = 0.205;
+  const lensG = new THREE.Mesh(new THREE.CircleGeometry(0.07, 20), mGlass);
+  lensG.position.z = 0.161;
   gimbGroup.add(lensG);
 
   // 2.5 ACTION CAMERA & ANTENNA (Customizer Add-ons)
   const goproGroup = new THREE.Group();
-  goproGroup.position.set(0, 0.51, 0.1); // mount on top of battery housing
+  goproGroup.position.set(0, 0.41, 0.30); // mount on top of TPU mount
   goproGroup.rotation.x = 0.2; // tilt up slightly
   goproGroup.visible = false; // hidden by default
   droneGroup.add(goproGroup);
@@ -168,7 +233,7 @@
   goproGroup.add(recordLED);
 
   const antennaGroup = new THREE.Group();
-  antennaGroup.position.set(0, 0.45, -0.42); // back of battery
+  antennaGroup.position.set(0, 0.28, -0.38); // back of top plate
   antennaGroup.rotation.x = -0.5;
   antennaGroup.visible = false;
   droneGroup.add(antennaGroup);
@@ -187,6 +252,17 @@
   const DUCT_RAD = 0.45;
   const ARM_ANGLES_DEG = [45, 135, 225, 315];
 
+  // Side bridges to merge the foam bumpers into a figure-8 layout
+  const foamBridgeR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.35), mDuctFoamRed);
+  foamBridgeR.position.set(0.438, 0.10, 0.0);
+  droneGroup.add(foamBridgeR);
+  ductMeshes.push(foamBridgeR);
+
+  const foamBridgeL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.35), mDuctFoamWhite);
+  foamBridgeL.position.set(-0.438, 0.10, 0.0);
+  droneGroup.add(foamBridgeL);
+  ductMeshes.push(foamBridgeL);
+
   ARM_ANGLES_DEG.forEach((deg, i) => {
     const rad = THREE.MathUtils.degToRad(deg);
     const mx = Math.sin(rad) * ARM_LENGTH;
@@ -196,15 +272,24 @@
     mntGroup.position.set(mx, 0.1, mz);
     droneGroup.add(mntGroup);
 
-    const duct = new THREE.Mesh(new THREE.TorusGeometry(DUCT_RAD, 0.08, 12, 32), mCFlight);
-    duct.rotation.x = Math.PI / 2;
-    mntGroup.add(duct);
-    ductMeshes.push(duct);
+    // Inner structural carbon duct
+    const innerDuct = new THREE.Mesh(new THREE.TorusGeometry(DUCT_RAD, 0.03, 12, 32), mCFlight);
+    innerDuct.rotation.x = Math.PI / 2;
+    mntGroup.add(innerDuct);
+    ductMeshes.push(innerDuct);
+
+    // Thick outer foam bumper (White on left side mx < 0, Red on right side mx > 0)
+    const bumperMat = (mx > 0) ? mDuctFoamRed : mDuctFoamWhite;
+    const foamBumper = new THREE.Mesh(new THREE.TorusGeometry(DUCT_RAD + 0.01, 0.08, 16, 32), bumperMat);
+    foamBumper.rotation.x = Math.PI / 2;
+    mntGroup.add(foamBumper);
+    ductMeshes.push(foamBumper);
     
-    for (let s = 0; s < 3; s++) {
+    // 5 motor struts (spokes) connecting motor mount to inner duct
+    for (let s = 0; s < 5; s++) {
       const strutG = new THREE.Group();
-      strutG.rotation.y = (s / 3) * Math.PI * 2 + (i % 2 !== 0 ? Math.PI / 6 : 0);
-      const strut = new THREE.Mesh(new THREE.BoxGeometry(DUCT_RAD, 0.03, 0.03), mCF);
+      strutG.rotation.y = (s / 5) * Math.PI * 2 + (i % 2 !== 0 ? Math.PI / 10 : 0);
+      const strut = new THREE.Mesh(new THREE.BoxGeometry(DUCT_RAD, 0.012, 0.025), mCF);
       strut.position.set(DUCT_RAD / 2, -0.08, 0); // connect to bottom of duct
       strutG.add(strut);
       mntGroup.add(strutG);

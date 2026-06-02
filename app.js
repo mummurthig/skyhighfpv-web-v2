@@ -360,3 +360,40 @@ fetch('/api/content')
 
 console.log('%c🚁 Sky High FPV', 'font-size:24px;color:#00d4ff;font-weight:bold;');
 console.log('%cBuilt with passion for the FPV community.', 'color:#94a3b8;font-size:13px;');
+
+/* ---- Terms & Conditions Modal Control ---- */
+const termsLink = document.getElementById('terms-link');
+const termsModal = document.getElementById('terms-modal');
+const closeTerms = document.getElementById('close-terms');
+
+if (termsLink && termsModal) {
+  termsLink.addEventListener('click', () => {
+    termsModal.style.display = 'flex';
+    setTimeout(() => {
+      termsModal.classList.add('open');
+      document.body.style.overflow = 'hidden'; // Lock page scrolling
+    }, 10);
+  });
+}
+
+const closeTermsModal = () => {
+  if (termsModal) {
+    termsModal.classList.remove('open');
+    setTimeout(() => {
+      termsModal.style.display = 'none';
+      document.body.style.overflow = ''; // Restore page scrolling
+    }, 300);
+  }
+};
+
+if (closeTerms) {
+  closeTerms.addEventListener('click', closeTermsModal);
+}
+
+if (termsModal) {
+  termsModal.addEventListener('click', (e) => {
+    if (e.target === termsModal) {
+      closeTermsModal();
+    }
+  });
+}
